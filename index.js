@@ -52,13 +52,37 @@ app.post('/users', (req, res) =>{
 // PUT
 app.put('/users/:userId', (req, res) =>{
   console.log("this updates a user's data")
-  // Trying to alter data
-  users[req.params.userId - 1]
-  res.json(users.filter(user => user._id == req.params.userId))
+  // First, you find the user whose data will be updated
+  const user = users.find((user) => user._id == req.params.userId)
+  // Then, you take the updates from the req body
+  const alterations = req.body
+  // You can use the spread operator to create a new variable with the contents of user.
+  // When you spread alterations, the new key values override the previous ones.
+  const updatedUser = {
+    ...user,
+    ...alterations
+  }
+  console.log(updatedUser)
+  // Next, you make a reference to the index for the user you updated.
+  let index = users.findIndex((user) => user._id == req.params.userId)
+  // You use the splice method, starting at that index, to remove 1 user
+  // and replace it with the updated user data.
+  users.splice(index, 1, updatedUser)
+  // Then you return the updated user as a response.
+  res.json(users[index])
 })
 // DELETE
 app.delete('/users/:userId', (req, res) =>{
   console.log('this deletes a user')
+  // You can use the same line from earlier to get the index for the 
+  // requested user
+  let index = users.findIndex((user) => user._id == req.params.userId)
+  // Only this time, you use .splice without any replacement variable.
+  // users.splice(index, 1)
+  // But the instructions don't want an actual deletion, but rather the addition
+  // of a new key/value pair:  isActive: false.  So instead...
+  const user = users.find((user) => user._id == req.params.userId)
+  user.isActive = false
   res.send('deleted!')
 })
 /* END - create routes here */
